@@ -7,14 +7,14 @@ public class CustomerReverseOrder {
 
     //todo: 2. надо реализовать методы этого класса
     //надо подобрать подходящую структуру данных, тогда решение будет в "две строчки"
-    ArrayList<Customer> reversList = new ArrayList<>();
+    Stack<Customer> reversList = new Stack<>();
 
     public void add(Customer customer) {
-        reversList.add(customer);
+        reversList.push(customer);
 
     }
 
     public Customer take() {
-        return reversList.remove(reversList.size() - 1);
+        return reversList.pop();
     }
 }
