@@ -20,7 +20,7 @@ public class TestAnnotations {
     public void firstBeforeMethodWithException() throws Exception {
         System.out.println("Метод с аннотацией Before и исключением");
         if (versionOfObject == 2) {
-            throw new RuntimeException("Исключение метода Before");
+            throw new RuntimeException("Exception метода Before");
         }
     }
 
@@ -38,7 +38,7 @@ public class TestAnnotations {
     public void secondMethodWithException() throws Exception {
         System.out.println("Метод с аннотацией Test и исключением");
         if (versionOfObject == 3) {
-            throw new RuntimeException("Исключение метода с аннотацией Test и исключением");
+            throw new RuntimeException("Exception метода с аннотацией Test и исключением");
         }
     }
 
