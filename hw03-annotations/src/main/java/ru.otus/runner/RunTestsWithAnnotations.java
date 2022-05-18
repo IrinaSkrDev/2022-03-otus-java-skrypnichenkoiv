@@ -3,14 +3,16 @@ package ru.otus.runner;
 import ru.otus.annotations.After;
 import ru.otus.annotations.Before;
 import ru.otus.annotations.Test;
+import ru.otus.testedClasses.ClassNeedForTesting;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
 public class RunTestsWithAnnotations {
     public static String runTests(Object className) throws Exception {
-        StateOfTest stateOfTest = new StateOfTest(className);
+        StateOfTest stateOfTest = new StateOfTest(className, "classNeedForTesting");
         getTestsMethods(stateOfTest);
         return runAllMethods(stateOfTest);
     }
@@ -41,9 +43,14 @@ public class RunTestsWithAnnotations {
         });
     }
 
-    private static String runAllMethods(StateOfTest stateOfTest) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private static String runAllMethods(StateOfTest stateOfTest) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         int successTests = 0;
         int failTests = 0;
+        ClassNeedForTesting classNeedForTesting = new ClassNeedForTesting("Пробуем!!!");
+        Field field = stateOfTest.getClazz().getDeclaredField(stateOfTest.getTestedInstanceName());
+        field.setAccessible(true);
+        field.set(stateOfTest.getClassName(), classNeedForTesting);
+
         try {
             for (int i = 0; i < stateOfTest.getBeforeMethod().size(); i++) {
                 Method methodBefore = stateOfTest.getClazz().getMethod(stateOfTest.getBeforeMethod().get(i));
