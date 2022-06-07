@@ -3,54 +3,56 @@ package testClass;
 import ru.otus.annotations.After;
 import ru.otus.annotations.Before;
 import ru.otus.annotations.Test;
-import ru.otus.testedClasses.ClassNeedForTesting;
 
 public class TestAnnotations {
-    int versionOfObject;
-    ClassNeedForTesting classNeedForTesting;
+    Integer versionOfObject;
 
-    public TestAnnotations(int versionOfObject) {
+    public TestAnnotations(Integer versionOfObject) {
         this.versionOfObject = versionOfObject;
     }
 
     @Before
     public void firstBeforeMethod() {
-       // classNeedForTesting = new ClassNeedForTesting("Test me!");
-        System.out.println("Метод с аннотацией Before ");
+        System.out.println(" Метод с аннотацией Before Готовим инстанс с versionOfObject = " + this.versionOfObject.toString());
+
     }
 
     @Before
     public void firstBeforeMethodWithException() throws Exception {
-        System.out.println("Метод с аннотацией Before и исключением");
+        System.out.println("Метод с аннотацией Before и исключением  versionOfObject = " + this.versionOfObject);
         if (versionOfObject == 2) {
             throw new RuntimeException("Exception метода Before");
         }
     }
 
     @Test
-    public void secondMethod() {
-        System.out.println("Метод с аннотацией Test  " + classNeedForTesting.getMyFIeld());
-
+    public String secondMethod() {
+        String result = "Первый тестирующий метод " + this.versionOfObject.toString();
+        System.out.println(result);
+        return result;
     }
 
     @Test
-    public void secondMethodDuble() {
-        System.out.println("Метод с аннотацией Test  " + classNeedForTesting.getMyFIeld());
+    public String secondMethodTest() {
+        String result = "Второй тестирующий метод " + this.versionOfObject.toString();
+        System.out.println(result);
+        return result;
     }
 
     @Test
-    public void secondMethodWithException() throws Exception {
-        System.out.println("Метод с аннотацией Test и исключением  ");
+    public String secondMethodWithException() throws Exception {
+        String result = "Третий тестирующий метод, должен упасть с ошибкой " + this.versionOfObject.toString();
+        System.out.println(result);
         if (versionOfObject == 3) {
             throw new RuntimeException("Exception метода с аннотацией Test и исключением");
         }
+        return result;
     }
 
     @After
     public void thirdMethod() {
-        System.out.println("Метод с аннотацией After" + this.classNeedForTesting.getMyFIeld());
-        this.classNeedForTesting = null;
-        System.out.println("Метод с аннотацией After Объект готов для GC  " + this.classNeedForTesting);
+        System.out.println("Метод с аннотацией After  " + this.versionOfObject.toString());
+        this.versionOfObject = null;
     }
 
 }

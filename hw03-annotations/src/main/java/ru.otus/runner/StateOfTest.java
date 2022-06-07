@@ -12,16 +12,14 @@ import java.util.List;
 @Setter
 public class StateOfTest {
     private final Object className;
-    private final String testedInstanceName;
-    private final Class<?> clazz;
+    private final Class<TestAnnotations> clazz;
     private final List<String> beforeMethod;
     private final List<String> testMethod;
     private final List<String> afterMethod;
 
-    public StateOfTest(Object className,  String testedClassName) {
+    public StateOfTest(Object className) {
         this.className = className;
-        this.clazz = className.getClass();
-        this.testedInstanceName = testedClassName;
+        this.clazz = (Class<TestAnnotations>) className.getClass();
         this.beforeMethod = new ArrayList<>();
         this.testMethod = new ArrayList<>();
         this.afterMethod = new ArrayList<>();
