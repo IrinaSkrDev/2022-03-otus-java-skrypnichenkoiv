@@ -1,8 +1,8 @@
 package ru.logs.proxy;
 
 import ru.logs.annotation.Log;
-import ru.logs.testedClass.ITestedClasses;
-import ru.logs.testedClass.TestedClass;
+import ru.logs.testedClass.TestedClasses;
+import ru.logs.testedClass.TestedClassImpl;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -13,21 +13,21 @@ public class Ioc {
     private Ioc() {
     }
 
-    public static ITestedClasses createItestedClasses() {
-        InvocationHandler invocationHandler = new DemoInvocationHandler(new TestedClass());
-        return (ITestedClasses) Proxy.newProxyInstance(Ioc.class.getClassLoader(), new Class<?>[]{ITestedClasses.class}, invocationHandler);
+    public static TestedClasses createItestedClasses() {
+        InvocationHandler invocationHandler = new DemoInvocationHandler(new TestedClassImpl());
+        return (TestedClasses) Proxy.newProxyInstance(Ioc.class.getClassLoader(), new Class<?>[]{TestedClasses.class}, invocationHandler);
     }
 
     static class DemoInvocationHandler implements InvocationHandler {
-        private final ITestedClasses testedClasses;
-
-        DemoInvocationHandler(ITestedClasses testedClasses) {
+        private final TestedClasses testedClasses;
+        private final Method[] methodsAll ;
+        DemoInvocationHandler(TestedClasses testedClasses) {
             this.testedClasses = testedClasses;
+            this.methodsAll = this.testedClasses.getClass().getDeclaredMethods();
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            Method[] methodsAll = testedClasses.getClass().getDeclaredMethods();
             Arrays.stream(methodsAll).forEach(met -> {
                 if (met.getName().equals(method.getName())
                         && Arrays.stream(met.getParameterTypes()).toList().equals(Arrays.stream(method.getParameterTypes()).toList())

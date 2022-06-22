@@ -1,6 +1,6 @@
 package ru.logs.testedClass;
 
-public interface ITestedClasses {
+public interface TestedClasses {
     public void calculation(int param);
     public void calculation(int param, int param1, int param2);
     public void calculation(int param, String param1);

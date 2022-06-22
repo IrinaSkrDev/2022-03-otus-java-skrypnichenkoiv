@@ -2,7 +2,7 @@ package ru.logs.testedClass;
 
 import ru.logs.annotation.Log;
 
-public class TestedClass implements ITestedClasses {
+public class TestedClassImpl implements TestedClasses {
 
     @Log
     @Override
