@@ -8,6 +8,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Ioc {
     private Ioc() {
@@ -20,10 +22,17 @@ public class Ioc {
 
     static class DemoInvocationHandler implements InvocationHandler {
         private final TestedClasses testedClasses;
-        private final Method[] methodsAll ;
+        private final Method[] methodsAll;
+
         DemoInvocationHandler(TestedClasses testedClasses) {
             this.testedClasses = testedClasses;
-            this.methodsAll = this.testedClasses.getClass().getDeclaredMethods();
+            List<Method> listM = Arrays.stream(this.testedClasses.getClass()
+                    .getDeclaredMethods()).filter(met -> {
+                        return met.isAnnotationPresent(Log.class);
+                    }
+            ).collect(Collectors.toList());
+            methodsAll = new Method[listM.size()];
+            listM.toArray(this.methodsAll);
         }
 
         @Override
@@ -31,8 +40,7 @@ public class Ioc {
             Arrays.stream(methodsAll).forEach(met -> {
                 if (met.getName().equals(method.getName())
                         && Arrays.stream(met.getParameterTypes()).toList().equals(Arrays.stream(method.getParameterTypes()).toList())
-                        && met.isAnnotationPresent(Log.class)) {
-
+                ) {
                     System.out.println("executed method: " + method.getName() + ", param: " + Arrays.stream(args).toList());
                 }
             });
