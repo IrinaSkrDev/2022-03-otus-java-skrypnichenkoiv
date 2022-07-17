@@ -3,14 +3,14 @@ package ru;
 import java.util.*;
 
 public class AtmImpl implements Atm {
-    private HashSet<BanknoteCell> banknotes = new HashSet<BanknoteCell>();// переделать на TreeSet
+    private Set<BanknoteCell> banknotes = new HashSet<BanknoteCell>();// переделать на TreeSet
 
     public AtmImpl(List<Denomination> listCells) {
         listCells.forEach(denomination -> this.banknotes.add(new BanknoteCell(denomination, 0)));
     }
 
     @Override
-    public HashSet<BanknoteCell> putBanknotes(Integer sum) throws RuntimeException {
+    public Set<BanknoteCell> putBanknotes(Integer sum)  {
         System.out.println("Кладем в банкомат " + sum);
         HashMap<Denomination, Integer> summByCells = new HashMap<>();
         summByCells = divingSum(sum, Denomination.FIVE_THOUSAND);

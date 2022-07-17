@@ -1,9 +1,9 @@
 package ru;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public interface Atm {
-    public HashSet<BanknoteCell> putBanknotes(Integer sum);
+    public Set<BanknoteCell> putBanknotes(Integer sum);
 
     public void getSum(Integer sum);
 
