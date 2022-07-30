@@ -7,6 +7,10 @@ import ru.otus.processor.Processor;
 public class ProcessorExceptionEverySomeTime implements Processor {
     private final DateTimeProvider dateTimeProvider;
 
+    public ProcessorExceptionEverySomeTime(DateTimeProvider dateTimeProvider) {
+        this.dateTimeProvider = dateTimeProvider;
+    }
+
     @Override
     public Message process(Message message) {
         if (dateTimeProvider.getDate().getSecond() % 2 == 0) {
@@ -15,7 +19,5 @@ public class ProcessorExceptionEverySomeTime implements Processor {
         return message;
     }
 
-    public ProcessorExceptionEverySomeTime(DateTimeProvider dateTimeProvider) {
-        this.dateTimeProvider = dateTimeProvider;
-    }
+
 }

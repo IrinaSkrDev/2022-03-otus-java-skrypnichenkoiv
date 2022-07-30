@@ -14,7 +14,6 @@ class ProcessorExceptionEverySomeTimeTest {
     @Test
     void process() {
         var processorExceptionEverySomeTime = new ProcessorExceptionEverySomeTime(() -> LocalDateTime.of(2022, 07, 3, 5, 4, 5));
-        var processorExceptionEverySomeTimeEx = new ProcessorExceptionEverySomeTime(() -> LocalDateTime.of(2022, 07, 3, 5, 4, 6));
         var message = new Message.Builder(1L).field1("field1")
                 .field2("field2")
                 .field3("field3")
@@ -23,8 +22,22 @@ class ProcessorExceptionEverySomeTimeTest {
                 .build();
         assertThat(processorExceptionEverySomeTime.process(message)).isEqualTo(message);
 
+    }
 
-        Exception exception = assertThrows(RuntimeException.class, () -> {  processorExceptionEverySomeTimeEx.process(message);});
+    @Test
+    void processException() {
+        var processorExceptionEverySomeTimeEx = new ProcessorExceptionEverySomeTime(() -> LocalDateTime.of(2022, 07, 3, 5, 4, 6));
+        var message = new Message.Builder(1L).field1("field1")
+                .field2("field2")
+                .field3("field3")
+                .field6("field6")
+                .field10("field10")
+                .build();
+
+
+        Exception exception = assertThrows(RuntimeException.class, () -> {
+            processorExceptionEverySomeTimeEx.process(message);
+        });
         String expectedMessage = "Четная секунда!";
         String actualMessage = exception.getMessage();
 
