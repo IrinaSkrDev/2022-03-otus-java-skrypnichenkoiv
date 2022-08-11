@@ -14,13 +14,16 @@ public class ProcessorAggregator implements Processor {
     @Override
     public Map<String, Double> process(List<Measurement> data) {
         //группирует выходящий список по name, при этом суммирует поля value
-
+/*
         Map<String, Double> result = data.stream()
                 .collect(groupingBy((Measurement::getName), summingDouble(Measurement::getValue)));
         Map<String, Double> resulrCopy = new TreeMap<>();
         for (String key : result.keySet()) {
             resulrCopy.put(key, result.get(key));
         }
-        return resulrCopy;
+        return resulrCopy;*/
+
+        return data.stream()
+                .collect(groupingBy((Measurement::getName), TreeMap::new, summingDouble(Measurement::getValue)));
     }
 }

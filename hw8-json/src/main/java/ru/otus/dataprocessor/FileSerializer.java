@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class FileSerializer implements Serializer {
-    File file;
+    final private File file;
     private final ObjectMapper mapper = new ObjectMapper();
 
     public FileSerializer(String fileName) {
