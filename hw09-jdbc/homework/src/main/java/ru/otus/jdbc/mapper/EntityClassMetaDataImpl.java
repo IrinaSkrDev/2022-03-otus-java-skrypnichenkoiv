@@ -10,20 +10,29 @@ import java.util.stream.Collectors;
 
 public class EntityClassMetaDataImpl implements EntityClassMetaData {
     final private Class<?> clazz;
-    private final List<Field> fields;
+    private final List<Field> fieldsWithoutId;
+    private final List<Field> allFields;
+    private final Field IdField;
 
-    public EntityClassMetaDataImpl(Object className) {
-        clazz = className.getClass();
-        fields = Arrays.stream(this.clazz.getClass().getFields()).filter(met -> {
+    public EntityClassMetaDataImpl(Class<?> clazz) {
+        this.clazz =clazz;
+        // не понимаю, что делаю не так. но getDeclaredFields не вытаскивает ни одного поля. а у класса в Reflectiondata =null
+        Field[] allField = this.clazz.getClass().getDeclaredFields();
+        System.out.println(allField[0]);
+        this.allFields = Arrays.stream(this.clazz.getClass().getDeclaredFields()).collect(Collectors.toList());
+        this.IdField = allFields.stream().filter(met -> {
                     return met.isAnnotationPresent(Id.class);
                 }
-        ).collect(Collectors.toList());
-
+        ).findFirst().get();
+        this.fieldsWithoutId = allFields.stream().filter(met -> {
+                    return !met.isAnnotationPresent(Id.class);
+                }
+        ).toList();
     }
 
     @Override
     public String getName() {
-        return clazz.getClass().getName();
+        return this.clazz.getName();
     }
 
     @Override
@@ -34,23 +43,16 @@ public class EntityClassMetaDataImpl implements EntityClassMetaData {
     @Id
     @Override
     public Field getIdField() {
-        return fields.stream().filter(met -> {
-                    return met.isAnnotationPresent(Id.class);
-                }
-        ).findFirst().get();
-
+        return this.IdField;
     }
 
     @Override
     public List<Field> getAllFields() {
-        return fields;
+        return this.allFields;
     }
 
     @Override
     public List<Field> getFieldsWithoutId() {
-        return fields.stream().filter(met -> {
-                    return !met.isAnnotationPresent(Id.class);
-                }
-        ).toList();
+        return this.fieldsWithoutId;
     }
 }
