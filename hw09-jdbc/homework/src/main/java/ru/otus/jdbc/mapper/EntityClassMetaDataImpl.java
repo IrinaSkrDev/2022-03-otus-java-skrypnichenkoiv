@@ -6,6 +6,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class EntityClassMetaDataImpl implements EntityClassMetaData {
@@ -15,11 +16,10 @@ public class EntityClassMetaDataImpl implements EntityClassMetaData {
     private final Field IdField;
 
     public EntityClassMetaDataImpl(Class<?> clazz) {
-        this.clazz =clazz;
-        // не понимаю, что делаю не так. но getDeclaredFields не вытаскивает ни одного поля. а у класса в Reflectiondata =null
-        Field[] allField = this.clazz.getClass().getDeclaredFields();
+        this.clazz = clazz;
+        Field[] allField = this.clazz.getDeclaredFields();
         System.out.println(allField[0]);
-        this.allFields = Arrays.stream(this.clazz.getClass().getDeclaredFields()).collect(Collectors.toList());
+        this.allFields = Arrays.stream(this.clazz.getDeclaredFields()).collect(Collectors.toList());
         this.IdField = allFields.stream().filter(met -> {
                     return met.isAnnotationPresent(Id.class);
                 }
@@ -32,7 +32,8 @@ public class EntityClassMetaDataImpl implements EntityClassMetaData {
 
     @Override
     public String getName() {
-        return this.clazz.getName();
+
+        return this.clazz.getSimpleName().toLowerCase(Locale.ROOT);
     }
 
     @Override

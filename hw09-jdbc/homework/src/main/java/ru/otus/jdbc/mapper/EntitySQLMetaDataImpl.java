@@ -1,5 +1,8 @@
 package ru.otus.jdbc.mapper;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -10,37 +13,50 @@ public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
     private final String updateSql;
 
     public EntitySQLMetaDataImpl(EntityClassMetaData entityClassMetaData) {
-        String listOfFieldSplitingByComma = entityClassMetaData.getAllFields().stream().map(field -> new String(field.toString())).collect(Collectors.joining(", ")).toString();
-        selectAllSql = "select " + listOfFieldSplitingByComma + " from " + entityClassMetaData.getName();
-        selectByIdSql = "select " + listOfFieldSplitingByComma +
+
+        selectAllSql = "select " + splitingFields(entityClassMetaData.getAllFields(), ", ") + " from " + entityClassMetaData.getName().toString();
+
+        selectByIdSql = "select " + splitingFields(entityClassMetaData.getAllFields(), ", ") +
                 " from " + entityClassMetaData.getName() +
                 " where " + entityClassMetaData.getIdField().getName() + " = ?";
-        insertSql = "insert into " + entityClassMetaData.getName() + "( " + entityClassMetaData.getFieldsWithoutId().stream().map(field -> new String(field.toString())).collect(Collectors.joining(", ")) +
-                  ") values (" + Stream.generate(() -> "?")
+
+        insertSql = "insert into " + entityClassMetaData.getName()
+                + "( " + splitingFields(entityClassMetaData.getFieldsWithoutId(), ", ") +
+                ") values (" + Stream.generate(() -> "?")
                 .limit(entityClassMetaData.getFieldsWithoutId().size())
                 .collect(Collectors.joining(", ")) + ")";
-        updateSql = "update " + entityClassMetaData.getName() +
-                      " set " + entityClassMetaData.getFieldsWithoutId().stream().map(field -> new String(field.toString())).collect(Collectors.joining(" = ?, ")) +
-                    " where " + entityClassMetaData.getIdField().getName() + " = ?";
+        updateSql = "update " + entityClassMetaData.getName().toString() +
+                " set " + splitingFields(entityClassMetaData.getFieldsWithoutId(), " = ?, ") + " = ? " +
+                " where " + entityClassMetaData.getIdField().getName() + " = ?";
     }
 
     @Override
     public String getSelectAllSql() {
+
         return selectAllSql;
     }
 
     @Override
     public String getSelectByIdSql() {
+
         return selectByIdSql;
     }
 
     @Override
     public String getInsertSql() {
+
         return insertSql;
     }
 
     @Override
     public String getUpdateSql() {
+
         return updateSql;
+    }
+
+    private String splitingFields(List<Field> listFields, String delimiter) {
+        List<String> listNamesAllFields = new ArrayList<>();
+        listFields.stream().forEach(a -> listNamesAllFields.add(a.getName()));
+        return listNamesAllFields.stream().collect(Collectors.joining(delimiter));
     }
 }

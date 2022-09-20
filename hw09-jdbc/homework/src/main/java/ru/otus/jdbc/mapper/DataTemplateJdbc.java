@@ -5,6 +5,8 @@ import ru.otus.core.repository.DataTemplateException;
 import ru.otus.core.repository.executor.DbExecutor;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,18 +26,41 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     @Override
     public Optional<T> findById(Connection connection, long id) {
 
-        throw new UnsupportedOperationException();
+        return (Optional<T>) dbExecutor.executeSelect(connection,entitySQLMetaData.getSelectByIdSql(), List.of(id),
+                rs -> {
+                    try {
+                        if (rs.next()) {
+                       System.out.println(rs.next());
+                       return rs.next();
+                        }
+                        return null;
+                    } catch (SQLException e) {
+                        throw new DataTemplateException(e);
+                    }
+                });
     }
 
     @Override
     public List<T> findAll(Connection connection) {
-        throw new UnsupportedOperationException();
+        return (List<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectAllSql(), Collections.emptyList(), rs -> {
+            try {
+                return rs.next();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+           return Collections.emptyList();
+        }).orElseThrow(() -> new RuntimeException("Unexpected error"));
     }
 
     @Override
     public long insert(Connection connection, T client) {
 
-        throw new UnsupportedOperationException();
+        try {
+            return dbExecutor.executeStatement(connection, entitySQLMetaData.getInsertSql(),
+                    Collections.singletonList(client));
+        } catch (Exception e) {
+            throw new DataTemplateException(e);
+        }
     }
 
     @Override
