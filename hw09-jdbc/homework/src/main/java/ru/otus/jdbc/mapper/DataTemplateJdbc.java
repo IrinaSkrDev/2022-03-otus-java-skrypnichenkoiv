@@ -4,8 +4,11 @@ import ru.otus.core.repository.DataTemplate;
 import ru.otus.core.repository.DataTemplateException;
 import ru.otus.core.repository.executor.DbExecutor;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -17,24 +20,27 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     private final DbExecutor dbExecutor;
     private final EntitySQLMetaData entitySQLMetaData;
+    EntityClassMetaData entityClassMetaData;
 
-    public DataTemplateJdbc(DbExecutor dbExecutor, EntitySQLMetaData entitySQLMetaData) {
+    public DataTemplateJdbc(DbExecutor dbExecutor, EntitySQLMetaData entitySQLMetaData, EntityClassMetaData entityClassMetaData) {
         this.dbExecutor = dbExecutor;
         this.entitySQLMetaData = entitySQLMetaData;
+        this.entityClassMetaData = entityClassMetaData;
     }
 
     @Override
     public Optional<T> findById(Connection connection, long id) {
 
-        return (Optional<T>) dbExecutor.executeSelect(connection,entitySQLMetaData.getSelectByIdSql(), List.of(id),
+        return (Optional<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), Collections.singletonList(id),
                 rs -> {
                     try {
                         if (rs.next()) {
-                       System.out.println(rs.next());
-                       return rs.next();
+                            var newObject =  entityClassMetaData.getConstructor().newInstance();
+                            newObject = rs.findColumn()
+                            return newObject;
                         }
                         return null;
-                    } catch (SQLException e) {
+                    } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                         throw new DataTemplateException(e);
                     }
                 });
@@ -48,7 +54,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-           return Collections.emptyList();
+            return Collections.emptyList();
         }).orElseThrow(() -> new RuntimeException("Unexpected error"));
     }
 
@@ -56,8 +62,18 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     public long insert(Connection connection, T client) {
 
         try {
+            List<Object> value = new ArrayList<>();
+            entityClassMetaData.getFieldsWithoutId().stream().forEach(a -> {
+                Field nameF = (Field) a;
+                nameF.setAccessible(true);
+                try {
+                    value.add(nameF.get(client).toString());
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            });
             return dbExecutor.executeStatement(connection, entitySQLMetaData.getInsertSql(),
-                    Collections.singletonList(client));
+                    value);
         } catch (Exception e) {
             throw new DataTemplateException(e);
         }
