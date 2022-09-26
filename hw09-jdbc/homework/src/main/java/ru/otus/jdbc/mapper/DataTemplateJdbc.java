@@ -21,6 +21,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     private final DbExecutor dbExecutor;
     private final EntitySQLMetaData entitySQLMetaData;
     EntityClassMetaData entityClassMetaData;
+    private Object fieldName;
 
     public DataTemplateJdbc(DbExecutor dbExecutor, EntitySQLMetaData entitySQLMetaData, EntityClassMetaData entityClassMetaData) {
         this.dbExecutor = dbExecutor;
@@ -35,9 +36,14 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 rs -> {
                     try {
                         if (rs.next()) {
-                            var newObject =  entityClassMetaData.getConstructor().newInstance();
-                            newObject = rs.findColumn()
-                            return newObject;
+                            var newStringToReturn =  entityClassMetaData.getConstructor().newInstance();
+                            List<Field> allField=entityClassMetaData.getAllFields();
+                            for(Field fieldName:allField){
+                                rs.getObject(fieldName.getName()); // как вот это значение положить в  объект newStringToReturn
+                                // чтобы можно было вернуть объект.
+                            }
+
+                            return newStringToReturn;
                         }
                         return null;
                     } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
