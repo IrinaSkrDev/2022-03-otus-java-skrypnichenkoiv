@@ -22,6 +22,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     private final EntitySQLMetaData entitySQLMetaData;
     EntityClassMetaData entityClassMetaData;
     private Object fieldName;
+    private Object newStringToReturn;
 
     public DataTemplateJdbc(DbExecutor dbExecutor, EntitySQLMetaData entitySQLMetaData, EntityClassMetaData entityClassMetaData) {
         this.dbExecutor = dbExecutor;
@@ -35,17 +36,18 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
         return (Optional<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), Collections.singletonList(id),
                 rs -> {
                     try {
+                        var newStringToReturn = entityClassMetaData.getConstructor().newInstance();
                         if (rs.next()) {
-                            var newStringToReturn =  entityClassMetaData.getConstructor().newInstance();
-                            List<Field> allField=entityClassMetaData.getAllFields();
-                            for(Field fieldName:allField){
-                                rs.getObject(fieldName.getName()); // как вот это значение положить в  объект newStringToReturn
-                                // чтобы можно было вернуть объект.
+                            List<Field> allField = entityClassMetaData.getAllFields();
+                            for (Field field : allField) {
+                                field.setAccessible(true);
+                                field.set(newStringToReturn, rs.getObject(field.getName()));
+
+
                             }
 
-                            return newStringToReturn;
                         }
-                        return null;
+                        return newStringToReturn;
                     } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                         throw new DataTemplateException(e);
                     }
@@ -73,7 +75,8 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 Field nameF = (Field) a;
                 nameF.setAccessible(true);
                 try {
-                    value.add(nameF.get(client).toString());
+                    var valeInField = nameF.get(client);
+                    value.add(valeInField);
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
