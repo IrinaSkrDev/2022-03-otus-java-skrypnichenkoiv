@@ -44,9 +44,9 @@ public class HomeWork {
 
 // Сделайте тоже самое с классом Manager (для него надо сделать свою таблицу)
 
-        EntityClassMetaData<Manager> entityClassMetaDataManager= new EntityClassMetaDataImpl(Manager.class);
+        EntityClassMetaData<Manager> entityClassMetaDataManager = new EntityClassMetaDataImpl(Manager.class);
         EntitySQLMetaData entitySQLMetaDataManager = new EntitySQLMetaDataImpl(entityClassMetaDataManager);
-        var dataTemplateManager = new DataTemplateJdbc<Manager>(dbExecutor, entitySQLMetaDataManager,entityClassMetaDataManager);
+        var dataTemplateManager = new DataTemplateJdbc<Manager>(dbExecutor, entitySQLMetaDataManager, entityClassMetaDataManager);
 
         var dbServiceManager = new DbServiceManagerImpl(transactionRunner, dataTemplateManager);
         dbServiceManager.saveManager(new Manager("ManagerFirst"));
@@ -55,6 +55,12 @@ public class HomeWork {
         var managerSecondSelected = dbServiceManager.getManager(managerSecond.getNo())
                 .orElseThrow(() -> new RuntimeException("Manager not found, id:" + managerSecond.getNo()));
         log.info("managerSecondSelected:{}", managerSecondSelected);
+        var thirdMan = new Manager("ManagerThird");
+        thirdMan.setNo(managerSecond.getNo());
+        var managerThird = dbServiceManager.saveManager(thirdMan);
+        var managerThirdSelected = dbServiceManager.getManager(managerSecond.getNo())
+                .orElseThrow(() -> new RuntimeException("Manager not found, id:" + managerSecond.getNo()));
+        log.info("managerThirdSelected:{}", managerThirdSelected);
     }
 
     private static void flywayMigrations(DataSource dataSource) {

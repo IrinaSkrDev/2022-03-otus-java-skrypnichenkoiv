@@ -20,11 +20,10 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     private final DbExecutor dbExecutor;
     private final EntitySQLMetaData entitySQLMetaData;
-    EntityClassMetaData entityClassMetaData;
-    private Object fieldName;
-    private Object newStringToReturn;
+    private final EntityClassMetaData<T> entityClassMetaData;
 
-    public DataTemplateJdbc(DbExecutor dbExecutor, EntitySQLMetaData entitySQLMetaData, EntityClassMetaData entityClassMetaData) {
+
+    public DataTemplateJdbc(DbExecutor dbExecutor, EntitySQLMetaData entitySQLMetaData, EntityClassMetaData<T> entityClassMetaData) {
         this.dbExecutor = dbExecutor;
         this.entitySQLMetaData = entitySQLMetaData;
         this.entityClassMetaData = entityClassMetaData;
@@ -33,41 +32,47 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
     @Override
     public Optional<T> findById(Connection connection, long id) {
 
-        return (Optional<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), Collections.singletonList(id),
-                rs -> {
-                    try {
-                        var newStringToReturn = entityClassMetaData.getConstructor().newInstance();
-                        if (rs.next()) {
-                            List<Field> allField = entityClassMetaData.getAllFields();
-                            for (Field field : allField) {
-                                field.setAccessible(true);
-                                field.set(newStringToReturn, rs.getObject(field.getName()));
+        return (Optional<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), Collections.singletonList(id), rs -> {
+            try {
+                var newObjectToReturn = entityClassMetaData.getConstructor().newInstance();
+                if (rs.next()) {
+                    List<Field> allField = entityClassMetaData.getAllFields();
+                    for (Field field : allField) {
+                        field.setAccessible(true);
+                        field.set(newObjectToReturn, rs.getObject(field.getName()));
 
 
-                            }
-
-                        }
-                        return newStringToReturn;
-                    } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        throw new DataTemplateException(e);
                     }
-                });
+
+                }
+                return newObjectToReturn;
+            } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new DataTemplateException(e);
+            }
+        });
     }
 
     @Override
     public List<T> findAll(Connection connection) {
         return (List<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectAllSql(), Collections.emptyList(), rs -> {
             try {
-                return rs.next();
-            } catch (SQLException e) {
-                e.printStackTrace();
+                var newObjectToReturn = entityClassMetaData.getConstructor().newInstance();
+                if (rs.next()) {
+                    List<Field> allField = entityClassMetaData.getAllFields();
+                    for (Field field : allField) {
+                        field.setAccessible(true);
+                        field.set(newObjectToReturn, rs.getObject(field.getName()));
+                    }
+                }
+                return newObjectToReturn;
+            } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new DataTemplateException(e);
             }
-            return Collections.emptyList();
-        }).orElseThrow(() -> new RuntimeException("Unexpected error"));
+        }).orElseThrow(() -> new DataTemplateException(new Exception()));
     }
 
     @Override
-    public long insert(Connection connection, T client) {
+    public long insert(Connection connection, T object) {
 
         try {
             List<Object> value = new ArrayList<>();
@@ -75,26 +80,36 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                 Field nameF = (Field) a;
                 nameF.setAccessible(true);
                 try {
-                    var valeInField = nameF.get(client);
+                    var valeInField = nameF.get(object);
                     value.add(valeInField);
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    new RuntimeException(e.getMessage());
                 }
             });
-            return dbExecutor.executeStatement(connection, entitySQLMetaData.getInsertSql(),
-                    value);
+            return dbExecutor.executeStatement(connection, entitySQLMetaData.getInsertSql(), value);
         } catch (Exception e) {
             throw new DataTemplateException(e);
         }
     }
 
     @Override
-    public void update(Connection connection, T client) {
+    public void update(Connection connection, T object) {
 
         try {
-
-
-            dbExecutor.executeStatement(connection, entitySQLMetaData.getUpdateSql(), List.of(client));
+            List<Object> value = new ArrayList<>();
+            entityClassMetaData.getFieldsWithoutId().stream().forEach(a -> {
+                        Field nameF = (Field) a;
+                        nameF.setAccessible(true);
+                        try {
+                            var valeInField = nameF.get(object);
+                            value.add(valeInField);
+                        } catch (IllegalAccessException e) {
+                            new RuntimeException(e.getMessage());
+                        }
+                    }
+            );
+            value.add(entityClassMetaData.getIdField().get(object));
+            dbExecutor.executeStatement(connection, entitySQLMetaData.getUpdateSql(), value);
         } catch (Exception e) {
             throw new DataTemplateException(e);
         }
