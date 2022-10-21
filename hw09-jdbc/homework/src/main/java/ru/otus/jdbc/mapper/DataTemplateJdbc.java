@@ -31,21 +31,18 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     @Override
     public Optional<T> findById(Connection connection, long id) {
-
-        return (Optional<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), Collections.singletonList(id), rs -> {
+        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectByIdSql(), Collections.singletonList(id), rs -> {
             try {
-                var newObjectToReturn = entityClassMetaData.getConstructor().newInstance();
                 if (rs.next()) {
+                    var newObjectToReturn = entityClassMetaData.getConstructor().newInstance();
                     List<Field> allField = entityClassMetaData.getAllFields();
                     for (Field field : allField) {
                         field.setAccessible(true);
                         field.set(newObjectToReturn, rs.getObject(field.getName()));
-
-
                     }
-
+                    return newObjectToReturn;
                 }
-                return newObjectToReturn;
+                return null;
             } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new DataTemplateException(e);
             }
@@ -54,17 +51,20 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
 
     @Override
     public List<T> findAll(Connection connection) {
-        return (List<T>) dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectAllSql(), Collections.emptyList(), rs -> {
+        return dbExecutor.executeSelect(connection, entitySQLMetaData.getSelectAllSql(), Collections.emptyList(), rs -> {
+            var objectList = new ArrayList<T>();
             try {
-                var newObjectToReturn = entityClassMetaData.getConstructor().newInstance();
-                if (rs.next()) {
+
+                while (rs.next()) {
+                    var newObjectToReturn = entityClassMetaData.getConstructor().newInstance();
                     List<Field> allField = entityClassMetaData.getAllFields();
                     for (Field field : allField) {
                         field.setAccessible(true);
                         field.set(newObjectToReturn, rs.getObject(field.getName()));
                     }
+                    objectList.add(newObjectToReturn);
                 }
-                return newObjectToReturn;
+                return objectList;
             } catch (SQLException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new DataTemplateException(e);
             }
@@ -83,7 +83,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                     var valeInField = nameF.get(object);
                     value.add(valeInField);
                 } catch (IllegalAccessException e) {
-                    new RuntimeException(e.getMessage());
+                    throw new DataTemplateException(e);
                 }
             });
             return dbExecutor.executeStatement(connection, entitySQLMetaData.getInsertSql(), value);
@@ -104,7 +104,7 @@ public class DataTemplateJdbc<T> implements DataTemplate<T> {
                             var valeInField = nameF.get(object);
                             value.add(valeInField);
                         } catch (IllegalAccessException e) {
-                            new RuntimeException(e.getMessage());
+                            throw new DataTemplateException(e);
                         }
                     }
             );

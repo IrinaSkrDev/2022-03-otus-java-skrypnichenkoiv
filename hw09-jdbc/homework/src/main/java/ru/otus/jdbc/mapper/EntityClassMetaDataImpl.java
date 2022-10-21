@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class EntityClassMetaDataImpl implements EntityClassMetaData {
+public class EntityClassMetaDataImpl<T> implements EntityClassMetaData<T> {
     final private Class<?> clazz;
     private final List<Field> fieldsWithoutId;
     private final List<Field> allFields;
     private final Field IdField;
 
-    public EntityClassMetaDataImpl(Class<?> clazz) {
+    public <T> EntityClassMetaDataImpl(Class<?> clazz) {
         this.clazz = clazz;
         Field[] allField = this.clazz.getDeclaredFields();
         System.out.println(allField[0]);
