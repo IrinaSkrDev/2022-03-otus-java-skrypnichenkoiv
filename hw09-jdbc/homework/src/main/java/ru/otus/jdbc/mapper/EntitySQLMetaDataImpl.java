@@ -12,7 +12,7 @@ public class EntitySQLMetaDataImpl implements EntitySQLMetaData {
     private final String insertSql;
     private final String updateSql;
 
-    public EntitySQLMetaDataImpl(EntityClassMetaData entityClassMetaData) {
+    public EntitySQLMetaDataImpl(EntityClassMetaData<?> entityClassMetaData) {
 
         selectAllSql = "select " + splitingFields(entityClassMetaData.getAllFields(), ", ") + " from " + entityClassMetaData.getName().toString();
 
