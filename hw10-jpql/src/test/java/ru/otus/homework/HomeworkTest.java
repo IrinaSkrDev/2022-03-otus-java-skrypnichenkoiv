@@ -71,6 +71,7 @@ class HomeworkTest {
             session.clear();
 
             var loadedClient = session.find(Client.class, 1L).clone();
+            var loadedPhone = session.find(Phone.class, 1L);
             assertThat(loadedClient)
                 .usingRecursiveComparison()
                 .isEqualTo(client);

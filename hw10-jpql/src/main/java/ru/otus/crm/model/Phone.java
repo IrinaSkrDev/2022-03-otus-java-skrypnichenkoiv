@@ -20,8 +20,8 @@ public class Phone {
     private Long phoneId;
     @Column(name = "phone_number")
     private String number;
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "client_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "client_id" , nullable=false)
     @LazyCollection(LazyCollectionOption.EXTRA)
     private Client client;
 

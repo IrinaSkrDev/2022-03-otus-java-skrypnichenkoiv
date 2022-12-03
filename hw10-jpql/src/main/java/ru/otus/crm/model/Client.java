@@ -1,18 +1,19 @@
 package ru.otus.crm.model;
 
 
-import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
-
+@Data
 @Entity
 @Table(name = "client")
-@AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = "phones")
 public class Client implements Cloneable {
 
     @Id
@@ -28,7 +29,7 @@ public class Client implements Cloneable {
     @LazyCollection(LazyCollectionOption.EXTRA)
     private Address address;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "client")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "client")
     private List<Phone> phones;
 
 
@@ -43,9 +44,19 @@ public class Client implements Cloneable {
         this.name = name;
     }
 
+    public Client(Long id, String name, Address address, List<Phone> phones) {
+        this.id = id;
+        this.name = name;
+        this.address=address;
+        this.phones=phones;
+        for (Phone phone: phones){
+            phone.setClient(this);
+        }
+    }
+
     @Override
     public Client clone() {
-        return new Client(this.id, this.name);
+        return new Client(this.id, this.name,this.address,this.getPhones());
     }
 
     public Long getId() {
@@ -63,6 +74,14 @@ public class Client implements Cloneable {
     public void setName(String name) {
         this.name = name;
     }
+
+    public void setPhones(List<Phone> phones){
+        this.phones=phones;
+        for (Phone phone: phones){
+            phone.setClient(this);
+        }
+    }
+
 
     @Override
     public String toString() {
