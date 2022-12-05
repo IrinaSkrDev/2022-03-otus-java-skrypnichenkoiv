@@ -4,8 +4,6 @@ package ru.otus.crm.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.List;
@@ -26,7 +24,7 @@ public class Client implements Cloneable {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "address_id")
-    @LazyCollection(LazyCollectionOption.EXTRA)
+    //@LazyCollection(LazyCollectionOption.EXTRA)
     private Address address;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "client")
