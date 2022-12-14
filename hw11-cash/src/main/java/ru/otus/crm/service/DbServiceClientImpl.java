@@ -63,6 +63,7 @@ public class DbServiceClientImpl implements DBServiceClient {
                 Thread.currentThread().interrupt();
             }
             var clientOptional = clientDataTemplate.findById(session, id);
+            if (clientOptional.isPresent()) cashClient.put(clientOptional.get().getId(), clientOptional.get());
             log.info("client: {}", clientOptional);
             return clientOptional;
         });
