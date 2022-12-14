@@ -39,6 +39,7 @@ public class DbServiceClientImpl implements DBServiceClient {
                 clientDataTemplate.insert(session, clientCloned);
                 log.info("created client: {}", clientCloned);
                 cashClient.put(clientCloned.getId(), clientCloned);
+                listener.notify(clientCloned.getId(), clientCloned, "save");
                 cashClient.addListener(listener);
                 return clientCloned;
             }
@@ -46,6 +47,7 @@ public class DbServiceClientImpl implements DBServiceClient {
             log.info("updated client: {}", clientCloned);
             cashClient.remove(clientCloned.getId());
             cashClient.put(clientCloned.getId(), clientCloned);
+            listener.notify(clientCloned.getId(), clientCloned, "update");
             cashClient.addListener(listener);
             return clientCloned;
         });
@@ -63,7 +65,12 @@ public class DbServiceClientImpl implements DBServiceClient {
                 Thread.currentThread().interrupt();
             }
             var clientOptional = clientDataTemplate.findById(session, id);
-            if (clientOptional.isPresent()) cashClient.put(clientOptional.get().getId(), clientOptional.get());
+            if (clientOptional.isPresent()) {
+                cashClient.put(clientOptional.get().getId(), clientOptional.get());
+                listener.notify(clientOptional.get().getId(), clientOptional.get(), "get");
+                cashClient.addListener(listener);
+            }
+            ;
             log.info("client: {}", clientOptional);
             return clientOptional;
         });
