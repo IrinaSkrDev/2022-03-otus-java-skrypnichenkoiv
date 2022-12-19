@@ -31,9 +31,15 @@ public class DbServiceDemo {
 ///
         var clientTemplate = new DataTemplateHibernate<>(Client.class);
 ///
+         final ru.otus.cache.HwListener<Long, Client> listener = new ru.otus.cache.HwListener<Long, Client>() {
+            @Override
+            public void notify(Long key, Client client, String action) {
+                log.info("key:{}, value:{}, action: {}", key, client, action);
+            }
+        };
         var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
         dbServiceClient.saveClient(new Client("dbServiceFirst"));
-
+        
         var clientSecond = dbServiceClient.saveClient(new Client("dbServiceSecond"));
         log.info("Before");
         var clientSecondSelected = dbServiceClient.getClient(clientSecond.getId())

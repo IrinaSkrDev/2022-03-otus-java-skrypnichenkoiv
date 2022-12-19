@@ -17,12 +17,7 @@ public class DbServiceClientImpl implements DBServiceClient {
     private final DataTemplate<Client> clientDataTemplate;
     private final TransactionManager transactionManager;
     private final MyCache<Long, Client> cashClient;
-    private final ru.otus.cache.HwListener<Long, Client> listener = new ru.otus.cache.HwListener<Long, Client>() {
-        @Override
-        public void notify(Long key, Client client, String action) {
-            log.info("key:{}, value:{}, action: {}", key, client, action);
-        }
-    };
+
 
     public DbServiceClientImpl(TransactionManager transactionManager, DataTemplate<Client> clientDataTemplate) {
         this.transactionManager = transactionManager;
@@ -39,16 +34,14 @@ public class DbServiceClientImpl implements DBServiceClient {
                 clientDataTemplate.insert(session, clientCloned);
                 log.info("created client: {}", clientCloned);
                 cashClient.put(clientCloned.getId(), clientCloned);
-                listener.notify(clientCloned.getId(), clientCloned, "save");
-                cashClient.addListener(listener);
+                cashClient.generateNotify(clientCloned.getId(), clientCloned,"save");
                 return clientCloned;
             }
             clientDataTemplate.update(session, clientCloned);
             log.info("updated client: {}", clientCloned);
             cashClient.remove(clientCloned.getId());
             cashClient.put(clientCloned.getId(), clientCloned);
-            listener.notify(clientCloned.getId(), clientCloned, "update");
-            cashClient.addListener(listener);
+            cashClient.generateNotify(clientCloned.getId(), clientCloned,"update");
             return clientCloned;
         });
     }
@@ -56,7 +49,6 @@ public class DbServiceClientImpl implements DBServiceClient {
     @Override
     public Optional<Client> getClient(long id) {
         Client client = cashClient.get(id);
-        cashClient.removeListener(listener);
         if (client != null) return Optional.of(client);
         return transactionManager.doInReadOnlyTransaction(session -> {
             try {
@@ -67,8 +59,6 @@ public class DbServiceClientImpl implements DBServiceClient {
             var clientOptional = clientDataTemplate.findById(session, id);
             if (clientOptional.isPresent()) {
                 cashClient.put(clientOptional.get().getId(), clientOptional.get());
-                listener.notify(clientOptional.get().getId(), clientOptional.get(), "get");
-                cashClient.addListener(listener);
             }
             ;
             log.info("client: {}", clientOptional);

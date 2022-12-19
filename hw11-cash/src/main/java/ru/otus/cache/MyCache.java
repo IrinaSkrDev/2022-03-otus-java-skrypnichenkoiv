@@ -35,4 +35,14 @@ public class MyCache<K, V> implements ru.otus.cache.HwCache<K, V> {
     public void removeListener(ru.otus.cache.HwListener<K, V> listener) {
         listner.remove(listener);
     }
+
+    public void generateNotify(K key, V value, String action) {
+        listner.forEach(listener -> {
+            try {
+                listener.notify(key,value, action);
+            } catch (Exception ex) {
+                //логирование исключения
+            }
+        });
+    }
 }
