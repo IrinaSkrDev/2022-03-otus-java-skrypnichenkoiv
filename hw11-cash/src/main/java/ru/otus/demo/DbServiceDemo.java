@@ -3,6 +3,7 @@ package ru.otus.demo;
 import org.hibernate.cfg.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.otus.cache.ConsumerClients;
 import ru.otus.core.repository.DataTemplateHibernate;
 import ru.otus.core.repository.HibernateUtils;
 import ru.otus.core.sessionmanager.TransactionManagerHibernate;
@@ -31,15 +32,11 @@ public class DbServiceDemo {
 ///
         var clientTemplate = new DataTemplateHibernate<>(Client.class);
 ///
-         final ru.otus.cache.HwListener<Long, Client> listener = new ru.otus.cache.HwListener<Long, Client>() {
-            @Override
-            public void notify(Long key, Client client, String action) {
-                log.info("key:{}, value:{}, action: {}", key, client, action);
-            }
-        };
+        var consumer = new ConsumerClients();
         var dbServiceClient = new DbServiceClientImpl(transactionManager, clientTemplate);
+        dbServiceClient.addListener(consumer);
         dbServiceClient.saveClient(new Client("dbServiceFirst"));
-        
+
         var clientSecond = dbServiceClient.saveClient(new Client("dbServiceSecond"));
         log.info("Before");
         var clientSecondSelected = dbServiceClient.getClient(clientSecond.getId())
@@ -54,5 +51,6 @@ public class DbServiceDemo {
 
         log.info("All clients");
         dbServiceClient.findAll().forEach(client -> log.info("client:{}", client));
+        dbServiceClient.removeListener(consumer);
     }
 }

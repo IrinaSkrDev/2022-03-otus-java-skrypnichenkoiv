@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.otus.cache.MyCache;
 import ru.otus.core.repository.DataTemplate;
-import ru.otus.crm.model.Client;
 import ru.otus.core.sessionmanager.TransactionManager;
+import ru.otus.crm.model.Client;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,14 +34,14 @@ public class DbServiceClientImpl implements DBServiceClient {
                 clientDataTemplate.insert(session, clientCloned);
                 log.info("created client: {}", clientCloned);
                 cashClient.put(clientCloned.getId(), clientCloned);
-                cashClient.generateNotify(clientCloned.getId(), clientCloned,"save");
+                cashClient.generateNotify(clientCloned.getId(), clientCloned, "save");
                 return clientCloned;
             }
             clientDataTemplate.update(session, clientCloned);
             log.info("updated client: {}", clientCloned);
             cashClient.remove(clientCloned.getId());
             cashClient.put(clientCloned.getId(), clientCloned);
-            cashClient.generateNotify(clientCloned.getId(), clientCloned,"update");
+            cashClient.generateNotify(clientCloned.getId(), clientCloned, "update");
             return clientCloned;
         });
     }
@@ -73,5 +73,13 @@ public class DbServiceClientImpl implements DBServiceClient {
             log.info("clientList:{}", clientList);
             return clientList;
         });
+    }
+
+    public void addListener(ru.otus.cache.HwListener<Long, Client> listener) {
+        cashClient.addListener(listener);
+    }
+
+    public void removeListener(ru.otus.cache.HwListener<Long, Client> listener) {
+        cashClient.removeListener(listener);
     }
 }
