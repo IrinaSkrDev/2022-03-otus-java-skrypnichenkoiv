@@ -34,14 +34,12 @@ public class DbServiceClientImpl implements DBServiceClient {
                 clientDataTemplate.insert(session, clientCloned);
                 log.info("created client: {}", clientCloned);
                 cashClient.put(clientCloned.getId(), clientCloned);
-                cashClient.generateNotify(clientCloned.getId(), clientCloned, "save");
                 return clientCloned;
             }
             clientDataTemplate.update(session, clientCloned);
             log.info("updated client: {}", clientCloned);
             cashClient.remove(clientCloned.getId());
             cashClient.put(clientCloned.getId(), clientCloned);
-            cashClient.generateNotify(clientCloned.getId(), clientCloned, "update");
             return clientCloned;
         });
     }

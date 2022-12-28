@@ -13,6 +13,7 @@ public class MyCache<K, V> implements ru.otus.cache.HwCache<K, V> {
     @Override
     public void put(K key, V value) {
         map.put(key, value);
+        generateNotify(key, value, "save");
     }
 
     @Override
@@ -36,7 +37,7 @@ public class MyCache<K, V> implements ru.otus.cache.HwCache<K, V> {
         listners.remove(listener);
     }
 
-    public void generateNotify(K key, V value, String action) {
+    private void generateNotify(K key, V value, String action) {
         listners.forEach(listener -> {
             try {
                 listener.notify(key, value, action);
