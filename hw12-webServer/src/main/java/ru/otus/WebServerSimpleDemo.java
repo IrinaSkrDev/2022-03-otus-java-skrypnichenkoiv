@@ -9,15 +9,12 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import ru.otus.core.repository.DataTemplateHibernate;
 import ru.otus.core.sessionmanager.TransactionManagerHibernate;
-import ru.otus.dao.DBServiceClient;
 import ru.otus.dao.DbServiceClientImpl;
-import ru.otus.dao.InMemoryUserDao;
-import ru.otus.dao.UserDao;
 import ru.otus.model.Address;
 import ru.otus.model.Client;
 import ru.otus.model.Phone;
-import ru.otus.server.UsersWebServer;
-import ru.otus.server.UsersWebServerSimple;
+import ru.otus.server.ClientWebServer;
+import ru.otus.server.ClientWebServerSimple;
 import ru.otus.services.*;
 
 /*
@@ -75,7 +72,7 @@ public class WebServerSimpleDemo {
         Gson gson = new GsonBuilder().serializeNulls().setPrettyPrinting().create();
         TemplateProcessor templateProcessor = new TemplateProcessorImpl(TEMPLATES_DIR);
 
-        UsersWebServer usersWebServer = new UsersWebServerSimple(WEB_SERVER_PORT, dbServiceClient,
+        ClientWebServer usersWebServer = new ClientWebServerSimple(WEB_SERVER_PORT, dbServiceClient,
                 gson, templateProcessor);
 
         usersWebServer.start();

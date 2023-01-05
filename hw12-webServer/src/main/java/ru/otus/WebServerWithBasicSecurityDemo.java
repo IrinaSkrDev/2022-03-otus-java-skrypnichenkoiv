@@ -18,9 +18,8 @@ import ru.otus.helpers.FileSystemHelper;
 import ru.otus.model.Address;
 import ru.otus.model.Client;
 import ru.otus.model.Phone;
-import ru.otus.server.UsersWebServer;
-import ru.otus.server.UsersWebServerWithBasicSecurity;
-import ru.otus.services.InMemoryLoginServiceImpl;
+import ru.otus.server.ClientWebServer;
+import ru.otus.server.ClientWebServerWithBasicSecurity;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.services.TemplateProcessorImpl;
 
@@ -84,7 +83,7 @@ public class WebServerWithBasicSecurityDemo {
         LoginService loginService = new HashLoginService(REALM_NAME, hashLoginServiceConfigPath);
         //LoginService loginService = new InMemoryLoginServiceImpl(userDao);
 
-        UsersWebServer usersWebServer = new UsersWebServerWithBasicSecurity(WEB_SERVER_PORT,
+        ClientWebServer usersWebServer = new ClientWebServerWithBasicSecurity(WEB_SERVER_PORT,
                 loginService, dbServiceClient, gson, templateProcessor);
 
         usersWebServer.start();

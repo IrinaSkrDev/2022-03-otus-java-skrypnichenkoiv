@@ -6,7 +6,6 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import ru.otus.dao.DBServiceClient;
-import ru.otus.dao.UserDao;
 import ru.otus.services.TemplateProcessor;
 import ru.otus.services.UserAuthService;
 import ru.otus.servlet.AuthorizationFilter;
@@ -15,14 +14,14 @@ import ru.otus.servlet.LoginServlet;
 
 import java.util.Arrays;
 
-public class UsersWebServerWithFilterBasedSecurity extends UsersWebServerSimple {
+public class ClientWebServerWithFilterBasedSecurity extends ClientWebServerSimple {
     private final UserAuthService authService;
 
-    public UsersWebServerWithFilterBasedSecurity(int port,
-                                                 UserAuthService authService,
-                                                 DBServiceClient dbServiceClient,
-                                                 Gson gson,
-                                                 TemplateProcessor templateProcessor) {
+    public ClientWebServerWithFilterBasedSecurity(int port,
+                                                  UserAuthService authService,
+                                                  DBServiceClient dbServiceClient,
+                                                  Gson gson,
+                                                  TemplateProcessor templateProcessor) {
         super(port, dbServiceClient, gson, templateProcessor);
         this.authService = authService;
     }
