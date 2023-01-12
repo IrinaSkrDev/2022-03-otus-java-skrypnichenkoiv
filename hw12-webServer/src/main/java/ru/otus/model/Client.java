@@ -1,12 +1,13 @@
 package ru.otus.model;
 
-
+import ru.otus.model.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
 import java.util.List;
+
 @Data
 @Entity
 @Table(name = "client")
@@ -27,7 +28,7 @@ public class Client implements Cloneable {
     //@LazyCollection(LazyCollectionOption.EXTRA)
     private Address address;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "client")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "client")
     private List<Phone> phones;
 
 
@@ -45,16 +46,16 @@ public class Client implements Cloneable {
     public Client(Long id, String name, Address address, List<Phone> phones) {
         this.id = id;
         this.name = name;
-        this.address=address;
-        this.phones=phones;
-        for (Phone phone: phones){
+        this.address = address;
+        this.phones = phones;
+        for (Phone phone : phones) {
             phone.setClient(this);
         }
     }
 
     @Override
     public Client clone() {
-        return new Client(this.id, this.name,this.address,this.getPhones());
+        return new Client(this.id, this.name, this.address, this.getPhones());
     }
 
     public Long getId() {
@@ -73,9 +74,9 @@ public class Client implements Cloneable {
         this.name = name;
     }
 
-    public void setPhones(List<Phone> phones){
-        this.phones=phones;
-        for (Phone phone: phones){
+    public void setPhones(List<Phone> phones) {
+        this.phones = phones;
+        for (Phone phone : phones) {
             phone.setClient(this);
         }
     }

@@ -5,23 +5,30 @@
 
 <body>
 <form action="/client" method="post">
-    <input type="text" name = "name" value="Вася" placeholder="Имя">
-    <input type="text" address = "address" value="lll@FF.COM" placeholder="адрес">
-    <input type="text" phone = "phone" value="Вася" placeholder="Имя">
+    <input type="text" name="name" value="Вася" placeholder="Имя">
+    <input type="text" name="address" value="lll@FF.COM" placeholder="адрес">
+    <input type="text" name="phone" value="Вася" placeholder="Имя">
     <input type="submit" value="Сохранить">
 </form>
 
 <h4>Список клиентов</h4>
 <table style="width: 400px">
-    <thead>
-        <tr>
-            <td style="width: 50px">Список</td>
-        </tr>
-    </thead>
     <tbody>
+    <#list clients as client>
     <tr>
-        <td>${client}</td>
+        <td> ${client.getName()}</td>
+        <td> ${client.getAddress().getStreet()}</td>
+        <td> <#list client.getPhones() as phones>
+        ${phones.getNumber()}
+        <#else>
+        <p>No phones</p>
+         </#list>
+         </td>
     </tr>
+    <#else>
+    <p>No clients</p>
+    </#list>
+
     </tbody>
 </table>
 </body>

@@ -17,7 +17,7 @@ import java.util.*;
 
 public class ClientServlet extends HttpServlet {
     private static final String CLIENT_PAGE_TEMPLATE = "client.html";
-    private static final String TEMPLATE_ATTR_CLIENTS = "client";
+    private static final String TEMPLATE_ATTR_CLIENTS = "clients";
     private final DBServiceClient dbServiceClient;
     private final TemplateProcessor templateProcessor;
 
@@ -30,13 +30,8 @@ public class ClientServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse response) throws IOException {
         Map<String, Object> paramsMap = new HashMap<>();
-        dbServiceClient.findAll().forEach(client ->{ paramsMap.put(TEMPLATE_ATTR_CLIENTS,client);
-        });
-        if (paramsMap.size()==0){
-        Client tempclient = new Client(null, "empty", new Address(null, "empty"),
-                List.of(new Phone(null, "empty")));
-            paramsMap.put(TEMPLATE_ATTR_CLIENTS,tempclient);
-        }
+        List<Client> clientsList =dbServiceClient.findAll();
+        paramsMap.put(TEMPLATE_ATTR_CLIENTS,clientsList);
         response.setContentType("text/html");
         response.getWriter().println(templateProcessor.getPage(CLIENT_PAGE_TEMPLATE,  paramsMap));
 
