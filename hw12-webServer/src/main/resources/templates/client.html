@@ -1,0 +1,35 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Клиенты</title>
+</head>
+
+<body>
+<form action="/client" method="post">
+    <input type="text" name="name" value="Вася" placeholder="Имя">
+    <input type="text" name="address" value="lll@FF.COM" placeholder="адрес">
+    <input type="text" name="phone" value="Вася" placeholder="Имя">
+    <input type="submit" value="Сохранить">
+</form>
+
+<h4>Список клиентов</h4>
+<table style="width: 400px">
+    <tbody>
+    <#list clients as client>
+    <tr>
+        <td> ${client.getName()}</td>
+        <td> ${client.getAddress().getStreet()}</td>
+        <td> <#list client.getPhones() as phones>
+        ${phones.getNumber()}
+        <#else>
+        <p>No phones</p>
+         </#list>
+         </td>
+    </tr>
+    <#else>
+    <p>No clients</p>
+    </#list>
+
+    </tbody>
+</table>
+</body>
+</html>

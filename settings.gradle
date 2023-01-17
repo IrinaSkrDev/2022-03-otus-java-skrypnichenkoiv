@@ -24,6 +24,7 @@ include 'hw10-cash:homework'
 include 'hw10-cash'
 include 'hw11-cash:homework'
 include 'hw10-jpql'
+include 'hw12-webServer'
 include 'hw11-cash'
 include 'hw13DI'
 
