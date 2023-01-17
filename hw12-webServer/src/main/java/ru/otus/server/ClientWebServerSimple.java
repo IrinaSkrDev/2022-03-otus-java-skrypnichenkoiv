@@ -54,7 +54,7 @@ public class ClientWebServerSimple implements ClientWebServer {
 
         HandlerList handlers = new HandlerList();
         handlers.addHandler(resourceHandler);
-        handlers.addHandler(applySecurity(servletContextHandler, "/client", "/clients"));
+        handlers.addHandler(applySecurity(servletContextHandler, "/client"));
 
 
         server.setHandler(handlers);
