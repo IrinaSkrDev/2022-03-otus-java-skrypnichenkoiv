@@ -31,7 +31,7 @@
             const clientAddress = clientAddressInput.value;
             const clientPhoneInput = document.getElementById("phone");
             const clientPhone = clientPhoneInput.value;
-            fetch('/api/client', {
+            fetch('/api/client/new', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json',
@@ -40,11 +40,12 @@
                 body: JSON.stringify({
                     name: clientName,
                     address: {street: clientAddress},
-                    phones: [{street: clientPhone}]
+                    phones: [{number: clientPhone}]
                 })
             })
                 .then(response => response.json())
                 .then(client => clientDataContainer.innerHTML = 'Клиент создан: ' + JSON.stringify(client));
+            ;
         }
     </script>
 </head>
@@ -64,7 +65,6 @@
     </div>
 
     <div class="row">
-        <button type="submit">Save with form</button>
         <button type="button" onclick="saveClient()">Save with REST</button>
     </div>
 </form>

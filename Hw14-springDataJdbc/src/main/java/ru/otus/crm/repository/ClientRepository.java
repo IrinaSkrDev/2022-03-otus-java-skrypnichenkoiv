@@ -17,7 +17,7 @@ public interface ClientRepository extends CrudRepository<Client, Long> {
     Optional<Client> findByNameIgnoreCase(@Param("name") String name);
 
     @Modifying
-    @Query("update client set name = :newName where id = :id")
+    @Query("update client set name = :newName where client_id = :id")
     void updateName(@Param("id") long id, @Param("newName") String newName);
 
     /*@Query("insert into client (name)VALUES (:newName)")

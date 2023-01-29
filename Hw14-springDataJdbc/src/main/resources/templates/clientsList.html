@@ -8,7 +8,7 @@
         function getClient(url, valueControlName) {
             const valueControl = document.getElementById(valueControlName);
             const clientDataContainer = document.getElementById('clientDataContainer');
-            const fullUrl = url + (valueControl? (encodeURIComponent(valueControl.value)) : '');
+            const fullUrl = url + (valueControl ? (encodeURIComponent(valueControl.value)) : '');
             fetch(fullUrl)
                 .then(response => response.json())
                 .then(client => clientDataContainer.innerHTML = JSON.stringify(client));
@@ -61,11 +61,18 @@
     </style>
 
     <style type="text/css" th:inline="text">
-        [[h3]] {
-            background-image: url([[@{/listmark.png}]]);
-            background-repeat: no-repeat;
-            padding: 2px;
-            padding-left: 30px;
+        [[h3]
+
+        ]
+        {
+            background-image: url([[@{/listmark.png}]])
+        ;
+            background-repeat: no-repeat
+        ;
+            padding: 2px
+        ;
+            padding-left: 30px
+        ;
         }
 
     </style>
@@ -94,15 +101,12 @@
         <td th:text="${client.clientId}">1</td>
         <td th:text="${client.name}">Чувак по умолчанию</td>
         <td th:text="${client.getAddress()}">Адрес должен быть</td>
+        <td th:text="${client.getPhones()}">Адрес должен быть</td>
 
     </tr>
     </tbody>
 </table>
 <a th:href="@{/client/create}" href="clientCreate.html">New client</a>
-
-
-
-
 
 
 <pre id="clientDataContainer"></pre>

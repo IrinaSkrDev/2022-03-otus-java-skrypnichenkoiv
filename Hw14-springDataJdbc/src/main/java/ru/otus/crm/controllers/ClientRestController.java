@@ -1,9 +1,15 @@
 package ru.otus.crm.controllers;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import ru.otus.crm.model.Client;
 import ru.otus.crm.service.DBServiceClient;
 
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 
 
@@ -18,6 +24,11 @@ public class ClientRestController {
 
     @GetMapping("/api/client/{id}")
     public Client getClientById(@PathVariable(name = "id") long id) {
+        if (!clientService.getClient(id).isPresent()) {
+            // throw new HttpClientErrorException("not fouund",HttpStatus.NOT_FOUND,null,null,null,null);
+            return new Client();
+        }
+
         return clientService.getClient(id).get();
     }
 
@@ -26,7 +37,7 @@ public class ClientRestController {
         return clientService.findAll();
     }
 
-    @PostMapping("/api/client")
+    @PostMapping("/api/client/new")
     public Client saveClient(@RequestBody Client client) {
         return clientService.saveClient(client);
     }
