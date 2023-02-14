@@ -7,9 +7,8 @@ import ru.otus.api.SensorDataProcessor;
 import ru.otus.api.model.SensorData;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -20,22 +19,22 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
 
     private final int bufferSize;
     private final SensorDataBufferedWriter writer;
-    private final NavigableMap<LocalDateTime, SensorData> dataBuffer = new ConcurrentSkipListMap<>();
-    private final List<SensorData> bufferedData = new CopyOnWriteArrayList<>();
+    private final ArrayBlockingQueue<SensorData> dataBuffer;
+
 
     public SensorDataProcessorBuffered(int bufferSize, SensorDataBufferedWriter writer) {
         this.bufferSize = bufferSize;
         this.writer = writer;
+        dataBuffer = new ArrayBlockingQueue(bufferSize);
     }
 
     @Override
     public void process(SensorData data) {
         if (dataBuffer.size() >= bufferSize) {
-
             flush();
-        } else {
-            dataBuffer.put(data.getMeasurementTime(), data);
         }
+        dataBuffer.add(data);
+
     /*
         if (dataBuffer.size() >= bufferSize) {
             flush();
@@ -45,15 +44,14 @@ public class SensorDataProcessorBuffered implements SensorDataProcessor {
 
     public void flush() {
         try {
-
-            for (int i = 0; i < this.bufferSize; i++) {
-                if (dataBuffer.firstEntry() != null) {
-                    bufferedData.add(dataBuffer.firstEntry().getValue());
-                    dataBuffer.pollFirstEntry();
-                }
+            List<SensorData> bufferedData = new CopyOnWriteArrayList<>();
+            bufferedData.clear();
+            dataBuffer.drainTo(bufferedData, bufferSize);
+            bufferedData.sort(Comparator.comparing(SensorData::getMeasurementTime));
+            if (!bufferedData.isEmpty()) {
+                writer.writeBufferedData(bufferedData);
             }
 
-            writer.writeBufferedData(bufferedData);
         } catch (Exception e) {
             log.error("Ошибка в процессе записи буфера", e);
         }
