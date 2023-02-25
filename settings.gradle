@@ -29,4 +29,5 @@ include 'hw11-cash'
 include 'hw13DI'
 include 'Hw14-springDataJdbc'
 include 'hw15-executors'
+include 'hw17-multiprocess:grpc-demo'
 
