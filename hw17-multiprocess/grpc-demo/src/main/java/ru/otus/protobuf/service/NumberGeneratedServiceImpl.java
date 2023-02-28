@@ -3,21 +3,17 @@ package ru.otus.protobuf.service;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.otus.protobuf.GRPCClient;
 import ru.otus.protobuf.generated.*;
 
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class RemoteDBServiceImpl extends RemoteDBServiceGrpc.RemoteDBServiceImplBase {
+public class NumberGeneratedServiceImpl extends NumberGeneratedServiceGrpc.NumberGeneratedServiceImplBase {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(RemoteDBServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(NumberGeneratedServiceImpl.class);
 
 
     @Override

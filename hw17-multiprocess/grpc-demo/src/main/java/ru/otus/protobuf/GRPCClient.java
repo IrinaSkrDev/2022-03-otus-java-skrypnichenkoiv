@@ -3,7 +3,6 @@ package ru.otus.protobuf;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import ru.otus.protobuf.generated.MyRequest;
-import ru.otus.protobuf.generated.RemoteDBServiceGrpc;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -11,6 +10,7 @@ import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.otus.protobuf.generated.NumberGeneratedServiceGrpc;
 import ru.otus.protobuf.service.ClientStreamObserver;
 
 public class GRPCClient {
@@ -25,7 +25,7 @@ public class GRPCClient {
                 .usePlaintext()
                 .build();
 
-        var stub = RemoteDBServiceGrpc.newStub(channel);
+        var stub = NumberGeneratedServiceGrpc.newStub(channel);
 
         logger.info("Начнем-с!");
         new GRPCClient().clientAction(stub);
@@ -35,7 +35,7 @@ public class GRPCClient {
 
     }
 
-    private void clientAction(RemoteDBServiceGrpc.RemoteDBServiceStub stub) {
+    private void clientAction(NumberGeneratedServiceGrpc.NumberGeneratedServiceStub stub) {
         var myRequest = MyRequest.newBuilder().setFirstValue(1).setEndValue(30).build();
         var clientStreamAbserver = new ClientStreamObserver();
         stub.getValue(myRequest, clientStreamAbserver);

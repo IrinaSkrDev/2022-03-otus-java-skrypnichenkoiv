@@ -5,7 +5,8 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.otus.protobuf.service.RemoteDBServiceImpl;
+import ru.otus.protobuf.service.NumberGeneratedServiceImpl;
+
 
 import java.io.IOException;
 
@@ -16,7 +17,7 @@ public class GRPCServer {
     public static void main(String[] args) throws IOException, InterruptedException {
 
 
-        var remoteDBService = new RemoteDBServiceImpl();
+        var remoteDBService = new NumberGeneratedServiceImpl();
 
         var server = ServerBuilder
                 .forPort(SERVER_PORT)
