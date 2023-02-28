@@ -2,54 +2,57 @@ package ru.otus.protobuf;
 
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
-import ru.otus.protobuf.generated.Empty;
-import ru.otus.protobuf.generated.MyMessage;
+import ru.otus.protobuf.generated.MyRequest;
 import ru.otus.protobuf.generated.RemoteDBServiceGrpc;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.concurrent.CountDownLatch;
 
-public class GRPCClient {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import ru.otus.protobuf.service.ClientStreamObserver;
 
+public class GRPCClient {
+    private static final Logger logger = LoggerFactory.getLogger(GRPCClient.class);
     private static final String SERVER_HOST = "localhost";
     private static final int SERVER_PORT = 8190;
+    private long value = 0;
 
     public static void main(String[] args) throws InterruptedException {
+        logger.info("start client...");
         var channel = ManagedChannelBuilder.forAddress(SERVER_HOST, SERVER_PORT)
                 .usePlaintext()
                 .build();
 
-        var stub = RemoteDBServiceGrpc.newBlockingStub(channel);
-        var temp = MyMessage.newBuilder().setEndValue(30L).setId(1L).build();
-        var savedUserMsg = stub.createListOfValue(MyMessage.newBuilder().setEndValue(30L).setId(1L).build());
+        var stub = RemoteDBServiceGrpc.newStub(channel);
 
-        System.out.printf("Мы задали значение");
+        logger.info("Начнем-с!");
+        new GRPCClient().clientAction(stub);
+        logger.info("shutdown client");
+        channel.shutdown();
 
-        var valueIterator = stub.getValue(Empty.getDefaultInstance());
-        System.out.println("Начнем-с!");
+
+    }
+
+    private void clientAction(RemoteDBServiceGrpc.RemoteDBServiceStub stub) {
+        var myRequest = MyRequest.newBuilder().setFirstValue(1).setEndValue(30).build();
+        var clientStreamAbserver = new ClientStreamObserver();
+        stub.getValue(myRequest, clientStreamAbserver);
 
         Long currentValue = 0L;
         Long valueFromServer = 0L;
         Long tempValue = 0L;
-        for (int i = 0; i <= 50; i++) {
-            if (valueIterator.hasNext()) {
-                tempValue = valueIterator.next().getId();
-                if (i == 0) {
-                    System.out.println("Начальное значение valueFromServer : " + tempValue.toString());
-                }
+        for (int i = 0; i < 50; i++) {
+            value = value + clientStreamAbserver.getLastValueAndReset() + 1;
+            logger.info("currentValue: " + value);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
-            if (valueFromServer == tempValue) {
-                currentValue = currentValue + 1;
-                System.out.println("currentValue: " + currentValue.toString());
-            } else {
-                System.out.println("valueFromServer : " + tempValue.toString());
-                currentValue = currentValue + tempValue + 1;
-                System.out.println("currentValue: " + currentValue.toString());
-            }
-            valueFromServer = tempValue;
         }
-        channel.shutdown();
 
 
     }

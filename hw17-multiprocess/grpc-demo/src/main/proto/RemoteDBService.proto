@@ -4,14 +4,16 @@ package ru.otus.protobuf.generated;
 
 option java_multiple_files = true;
 
-message MyMessage {
-  int64 id = 1;
+message MyRequest {
+  int64 firstValue = 1;
   int64 endValue = 30;
 }
 
-message Empty {}
+message MyResponse {
+  int64 responseValue = 1;
+}
+
 
 service RemoteDBService {
-  rpc createListOfValue(MyMessage) returns (MyMessage);
-  rpc getValue(Empty) returns (stream MyMessage);
+  rpc getValue(MyRequest) returns (stream MyResponse);
 }
