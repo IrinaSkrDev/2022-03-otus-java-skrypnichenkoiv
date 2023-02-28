@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package ru.otus.protobuf.generated;
+
+option java_multiple_files = true;
+
+message MyRequest {
+  int64 firstValue = 1;
+  int64 endValue = 30;
+}
+
+message MyResponse {
+  int64 responseValue = 1;
+}
+
+
+service NumberGeneratedService {
+  rpc getValue(MyRequest) returns (stream MyResponse);
+}
