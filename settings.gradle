@@ -30,3 +30,9 @@ include 'hw13DI'
 include 'Hw14-springDataJdbc'
 include 'hw15-executors'
 
+
+include 'L38-webflux-chat:client-service'
+include 'L38-webflux-chat:datastore-service'
+
+include 'hw18-webflux-chat:client-service'
+include 'hw18-webflux-chat:datastore-service'
